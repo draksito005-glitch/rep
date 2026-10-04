@@ -142,7 +142,7 @@
             color: #cbd5e1;
         }
 
-        /* Publicidad Lateral (Para AdSense) */
+        /* Publicidad Lateral Discreta (Para monetizar con AdSense) */
         .ads-sidebar {
             width: 160px;
             background-color: #1e293b;
@@ -171,10 +171,12 @@
     </header>
 
     <div class="main-wrapper">
+        <!-- Bloque publicitario izquierdo -->
         <div class="ads-sidebar">
             Espacio Publicitario Lateral (Ej. AdSense 160x600)
         </div>
 
+        <!-- Área de la herramienta -->
         <main class="content-area">
             <h2>Descargador de Instagram Online</h2>
             <p>Pega el enlace de cualquier Reel o Video público para extraer el archivo original.</p>
@@ -196,11 +198,13 @@
             </div>
         </main>
 
+        <!-- Bloque publicitario derecho -->
         <div class="ads-sidebar">
             Espacio Publicitario Lateral (Ej. AdSense 160x600)
         </div>
     </div>
 
+    <!-- EL MOTOR DE CONEXIÓN CON RAPIDAPI -->
     <script>
         async function procesarDescarga() {
             const urlInput = document.getElementById('videoUrl').value;
@@ -212,18 +216,25 @@
                 return;
             }
 
+            // Limpiamos resultados de búsquedas anteriores
             resultContainer.style.display = "none";
 
+            // Cambiamos el texto del botón a modo de espera
             const boton = document.querySelector('.download-box button');
             boton.innerText = "Procesando...";
             boton.disabled = true;
 
-            // ENLACE CONECTADO DIRECTAMENTE A TU CUENTA DE RAPIDAPI
+            /* 
+               AQUÍ SE CONECTAN TUS CREDENCIALES REALES DE RAPIDAPI.
+               La función 'fetch' de abajo toma estos datos y llama directamente al servidor
+               del motor de descargas de Instagram que seleccionamos en la tienda.
+            */
             const urlApi = 'https://rapidapi.com'; 
             const apiKey = '30e40aa3c1mshc15c52b017ed439p1e1ad0jsnb3b33a59bf1b';
             const apiHost = '://rapidapi.com';
 
             try {
+                // Petición de red real enviando el enlace del usuario
                 const response = await fetch(`${urlApi}?url=${encodeURIComponent(urlInput)}`, {
                     method: 'GET',
                     headers: {
@@ -235,10 +246,11 @@
                 const data = await response.json();
                 console.log("Respuesta de la API:", data);
                 
-                // Buscamos las variables de video comunes de este motor
-                const videoUrlReal = data.media || data.downloadUrl || data.url || (data.links && data.links?.url);
+                // Mapeamos las diferentes respuestas posibles que entrega este motor específico
+                const videoUrlReal = data.media || data.downloadUrl || data.url || (data.links && data.links[0]?.url) || (data.links && data.links.url);
 
                 if (videoUrlReal) {
+                    // Si encontramos el MP4, lo inyectamos en el botón verde y lo volvemos visible
                     downloadLink.href = videoUrlReal;
                     resultContainer.style.display = "block"; 
                     alert("¡Video procesado con éxito! Haz clic en el botón verde de abajo para guardarlo.");
@@ -250,6 +262,7 @@
                 console.error("Error en la conexión:", error);
                 alert("Hubo un problema de conexión con el motor de descargas.");
             } finally {
+                // Regresamos el botón a su estado original listo para otra descarga
                 boton.innerText = "Descargar";
                 boton.disabled = false;
             }
